@@ -1,44 +1,22 @@
-name: Approve PR on command
+name: Comment Pr Tip
+
 on:
-  issue_comment:
-    types: [created]
-permissions:
-  pull-requests: write
+  pull_request:
+    types: [opened]
+
 jobs:
-  check-and-approve:
+  add-comment:
     runs-on: ubuntu-latest
     steps:
-    - name: Debug Event Data
-      run: |
-        echo "Event type: ${{ github.event_name }}"
-        echo "Is PR: ${{ github.event.issue.pull_request }}"
-        echo "Comment body: ${{ github.event.comment.body }}"
-        echo "Commenter: ${{ github.event.comment.user.login }}"
-        
-    - name: Check for /approve command
-      if: github.event.issue.pull_request && contains(github.event.comment.body, '/approve')
-      id: check_approve
-      uses: actions/github-script@v6
-      with:
-        script: |
-          console.log('Starting approval process...');
-          const commenter = context.payload.comment.user.login;
-          console.log(`Commenter: ${commenter}`);
-          
-          if (commenter === 'QingFeng-awa') {
-            const prNumber = context.payload.issue.number;
-            console.log(`Approving PR #${prNumber}`);
+      - name: Add PR comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const comment = "您创建了一个拉取请求。\n如果你已准备好审查,可随时通过`/ready-for-revivew`命令来立即请求审查。";
             
-            await github.rest.pulls.createReview({
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: prNumber,
-              event: 'APPROVE'
+              body: comment
             });
-            
-            console.log('PR approved successfully');
-            return 'PR approved by authorized user';
-          } else {
-            console.log(`Unauthorized user attempted approval: ${commenter}`);
-            return 'Approval attempt by unauthorized user: ' + commenter;
-          }
