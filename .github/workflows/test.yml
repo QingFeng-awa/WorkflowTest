@@ -1,0 +1,15 @@
+name: Assign PR to QingFeng-awa
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  assign-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign PR to QingFeng-awa
+        uses: actions-ecosystem/action-add-assignee@v1
+        with:
+          assignees: QingFeng-awa
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
