@@ -1,24 +1,69 @@
-name: Comment Pr Tip
-
+name: Request QingFeng Review
 on:
-  pull_request:
-    types: [opened]
+  issue_comment:
+    types: [created]
+
 permissions:
   pull-requests: write
 
 jobs:
-  add-comment:
+  request-review:
     runs-on: ubuntu-latest
     steps:
-      - name: Add PR comment
+      - name: Check for /ready-for-review command
+        id: check-command
         uses: actions/github-script@v6
         with:
           script: |
-            const comment = "您创建了一个拉取请求。\n如果你已准备好审查,可随时通过`/ready-for-revivew`命令来立即请求审查。";
-            
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            const commentBody = context.payload.comment.body.trim();
+            if (commentBody === '/ready-for-review') {
+              return true;
+            }
+            return false;
+          result-encoding: string
+
+      - name: Get PR details
+        if: steps.check-command.outputs.result == 'true'
+        id: get-pr
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
+              pull_number: context.payload.issue.number
+            });
+            return {
+              requested_reviewers: pr.requested_reviewers.map(r => r.login),
+              has_qingfeng: pr.requested_reviewers.some(r => r.login === 'QingFeng-awa')
+            };
+
+      - name: Request review from QingFeng-awa if not already requested
+        if: steps.check-command.outputs.result == 'true' && steps.get-pr.outputs.result.has_qingfeng == 'false'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.issue.number,
+              reviewers: ['QingFeng-awa']
+            });
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: '已请求**QingFeng-awa**进行审查。'
+            });
+
+      - name: Comment if review already requested
+        if: steps.check-command.outputs.result == 'true' && steps.get-pr.outputs.result.has_qingfeng == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: '您已请求进行审查,请不要重复发送审查请求。'
             });
