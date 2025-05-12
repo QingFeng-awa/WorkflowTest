@@ -1,22 +1,35 @@
-name: Assign PR to QingFeng-awa
-
+name: Approve PR on command
 on:
-  pull_request:
-    types: [opened]
+  issue_comment:
+    types: [created]
 
 jobs:
-  assign-pr:
+  check-and-approve:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
-      - name: Assign PR to QingFeng-awa
-        uses: actions/github-script@v6
-        with:
-          script: |
-            await github.rest.issues.addAssignees({
+    - name: Check for /approve command
+      if: github.event.issue.pull_request && contains(github.event.comment.body, '/approve')
+      id: check_approve
+      uses: actions/github-script@v6
+      with:
+        script: |
+          // 获取评论者用户名
+          const commenter = context.payload.comment.user.login;
+          
+          // 验证评论者是否为 QingFneg-awa
+          if (commenter === 'QingFneg-awa') {
+            // 获取 PR 编号
+            const prNumber = context.payload.issue.number;
+            
+            // 创建 PR 批准
+            await github.rest.pulls.createReview({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-              assignees: ['QingFeng-awa']
-            })
+              pull_number: prNumber,
+              event: 'APPROVE'
+            });
+            
+            return 'PR approved by authorized user';
+          } else {
+            return 'Approval attempt by unauthorized user: ' + commenter;
+          }
