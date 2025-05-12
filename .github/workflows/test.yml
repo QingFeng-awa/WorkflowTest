@@ -7,9 +7,16 @@ on:
 jobs:
   assign-pr:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Assign PR to QingFeng-awa
-        uses: actions-ecosystem/action-add-assignee@v1
+        uses: actions/github-script@v6
         with:
-          assignees: QingFeng-awa
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              assignees: ['QingFeng-awa']
+            })
