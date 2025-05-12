@@ -3,6 +3,8 @@ name: Comment Pr Tip
 on:
   pull_request:
     types: [opened]
+permissions:
+  pull-requests: write
 
 jobs:
   add-comment:
