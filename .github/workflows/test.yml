@@ -3,7 +3,10 @@ name: Add labels to the PR initiated for Crowdin
 on:
   pull_request:
     types: [opened]
-
+  
+permissions:
+  pull-requests: write
+  
 jobs:
   check-and-label:
     runs-on: ubuntu-latest
