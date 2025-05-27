@@ -14,32 +14,9 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            try {
-              // 获取所有里程碑
-              const milestones = await github.rest.issues.listMilestones({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                state: 'open'
-              });
-              
-              // 查找名为'v2'的里程碑
-              const v2Milestone = milestones.data.find(m => m.title === 'v2');
-              
-              if (!v2Milestone) {
-                console.log('v2 milestone not found');
-                return;
-              }
-              
-              // 为PR添加里程碑
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.pull_request.number,
-                milestone: v2Milestone.number
-              });
-              
-              console.log(`Added v2 milestone to PR #${context.payload.pull_request.number}`);
-            } catch (error) {
-              console.error('Error:', error);
-            }
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              milestone: 3
+            })
