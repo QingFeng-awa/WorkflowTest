@@ -1,28 +1,45 @@
-name: Add labels to the PR initiated for Crowdin
-
+name: Add milestone to PR
 on:
   pull_request:
     types: [opened]
-  
+
 permissions:
   pull-requests: write
-  
+
 jobs:
-  check-and-label:
+  add-milestone:
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR title and add labels
+      - name: Add v2 milestone to PR
         uses: actions/github-script@v6
         with:
           script: |
-            if (context.payload.pull_request.title.includes('New Crowdin updates')) {
-              await github.rest.issues.addLabels({
+            try {
+              // 获取所有里程碑
+              const milestones = await github.rest.issues.listMilestones({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open'
+              });
+              
+              // 查找名为'v2'的里程碑
+              const v2Milestone = milestones.data.find(m => m.title === 'v2');
+              
+              if (!v2Milestone) {
+                console.log('v2 milestone not found');
+                return;
+              }
+              
+              // 为PR添加里程碑
+              await github.rest.issues.update({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.payload.pull_request.number,
-                labels: ['Crowdin', 'Feature']
+                milestone: v2Milestone.number
               });
-              console.log('Added Crowdin and Feature labels to the PR');
-            } else {
-              console.log('PR title does not match "New Crowdin updates", no labels added');
+              
+              console.log(`Added v2 milestone to PR #${context.payload.pull_request.number}`);
+            } catch (error) {
+              console.error('Error:', error);
             }
+          github-token: ${{ secrets.GITHUB_TOKEN }}
