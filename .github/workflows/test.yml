@@ -3,6 +3,7 @@ name: Trigger API on Push
 on:
   push:
     branches: [ main ]  # 你可以根据需要修改分支名称
+  workflow_dispatch:
 
 env:
   1PanelToken: ${{ secrets.ONE_PANEL_TOKEN }}  # 需要在仓库的Secrets中设置
