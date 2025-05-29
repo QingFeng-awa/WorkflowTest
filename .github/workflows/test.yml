@@ -6,6 +6,7 @@ on:
 
 env:
   PANEL_API_KEY: ${{ secrets.PANEL_API_KEY }}
+  API_BASE_URL: ${{ secrets.API_BASE_URL }}
 
 jobs:
   call-api:
@@ -16,31 +17,20 @@ jobs:
         run: |
           timestamp=$(date +%s)
           echo "TIMESTAMP=$timestamp" >> $GITHUB_ENV
-
           token=$(echo -n "1panel${{ env.PANEL_API_KEY }}${timestamp}" | md5sum | awk '{print $1}')
           echo "PANEL_TOKEN=$token" >> $GITHUB_ENV
 
       - name: Call API
         run: |
+          api_url="${{ env.API_BASE_URL }}/api/v1/cronjobs/handle"
+          
           response=$(curl -s -X 'POST' \
-            'https://panel.qingfengawa.top:11451/api/v1/cronjobs/handle' \
+            "$api_url" \
             -H 'accept: application/json' \
             -H 'Content-Type: application/json' \
             -H "1Panel-Token: ${{ env.PANEL_TOKEN }}" \
             -H "1Panel-Timestamp: ${{ env.TIMESTAMP }}" \
-            -d '{"id": 10}')
+            -d '{"id": 11}')
 
-          echo "API Response: $response"
-
-          if ! echo "$response" | jq -e . >/dev/null 2>&1; then
-            echo "Error: Invalid JSON response"
-            exit 1
-          fi
-
-          code=$(echo "$response" | jq -r '.code')
-          if [ "$code" != "200" ]; then
-            echo "Error: API returned code $code"
-            exit 1
-          fi
-
-          echo "API call succeeded"
+          echo "API Response: $(echo "$response" | jq -c)"
+          echo "$response" | jq -e '.code == 200' || exit 1
