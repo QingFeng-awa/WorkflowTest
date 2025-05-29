@@ -18,7 +18,7 @@ jobs:
       - name: Call API and verify response
         run: |
           response=$(curl -s -v -X 'POST' \
-            'http://panel.qingfengawa.top:11451/api/v1/cronjobs/handle' \
+            'https://panel.qingfengawa.top:11451/api/v1/cronjobs/handle' \
             -H 'accept: application/json' \
             -H 'Content-Type: application/json' \
             -H "1Panel-Token: ${{ env.PANEL_TOKEN }}" \
