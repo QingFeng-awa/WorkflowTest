@@ -1,22 +1,44 @@
-name: Add milestone to PR
-on:
-  pull_request:
-    types: [opened]
+name: Trigger API on Push
 
-permissions:
-  pull-requests: write
+on:
+  push:
+    branches: [ main ]  # 你可以根据需要修改分支名称
+
+env:
+  1PanelToken: ${{ secrets.ONE_PANEL_TOKEN }}  # 需要在仓库的Secrets中设置
 
 jobs:
-  add-milestone:
+  call-api:
     runs-on: ubuntu-latest
     steps:
-      - name: Add v2 milestone to PR
-        uses: actions/github-script@v6
-        with:
-          script: |
-            await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-              milestone: 1
-            })
+      - name: Get current timestamp
+        id: timestamp
+        run: echo "CURRENT_TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Call API
+        run: |
+          response=$(curl -s -X 'POST' \
+            'http://panel.qingfengawa.top:11451/api/v1/cronjobs/handle' \
+            -H 'accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -H "1Panel-Token: ${{ env.1PanelToken }}" \
+            -H "1Panel-Timestamp: ${{ env.CURRENT_TIMESTAMP }}" \
+            -d '{
+              "id": 11
+            }')
+
+          # 解析响应中的code字段
+          code=$(echo $response | jq -r '.code')
+          
+          if [ "$code" != "200" ]; then
+            echo "API call failed with response: $response"
+            exit 1
+          else
+            echo "API call succeeded"
+          fi
+        env:
+          ONE_PANEL_TOKEN: ${{ secrets.ONE_PANEL_TOKEN }}
+
+      - name: Verify success
+        if: ${{ failure() }}
+        run: exit 1
