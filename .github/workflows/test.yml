@@ -2,11 +2,10 @@ name: Trigger API on Push
 
 on:
   push:
-    branches: [ main ]  # 你可以根据需要修改分支名称
-  workflow_dispatch:
+    branches: [ main ]  # 可修改为你的目标分支
 
 env:
-  1PanelToken: ${{ secrets.ONE_PANEL_TOKEN }}  # 需要在仓库的Secrets中设置
+  PANEL_TOKEN: ${{ secrets.PANEL_TOKEN }}  # 变量名改为字母开头
 
 jobs:
   call-api:
@@ -22,13 +21,13 @@ jobs:
             'http://panel.qingfengawa.top:11451/api/v1/cronjobs/handle' \
             -H 'accept: application/json' \
             -H 'Content-Type: application/json' \
-            -H "1Panel-Token: ${{ env.1PanelToken }}" \
+            -H "1Panel-Token: ${{ env.PANEL_TOKEN }}" \  # 使用修正后的变量名
             -H "1Panel-Timestamp: ${{ env.CURRENT_TIMESTAMP }}" \
             -d '{
               "id": 11
             }')
 
-          # 解析响应中的code字段
+          # 检查 API 返回的 code
           code=$(echo $response | jq -r '.code')
           
           if [ "$code" != "200" ]; then
@@ -37,8 +36,6 @@ jobs:
           else
             echo "API call succeeded"
           fi
-        env:
-          ONE_PANEL_TOKEN: ${{ secrets.ONE_PANEL_TOKEN }}
 
       - name: Verify success
         if: ${{ failure() }}
