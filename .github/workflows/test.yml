@@ -1,15 +1,12 @@
-name: 'Auto Assign Pull Request'
+name: 'Auto Assign'
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, ready_for_review]
 
 jobs:
   add-reviews:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: kentaro-m/auto-assign-action@v2.0.0
         with:
-          addReviewers: false
-          addAssignees: true
-          numberOfAssignees: 0
-          assignees: QingFeng-awa
+          configuration-path: '.github/AutoAssignConfig.yml'
