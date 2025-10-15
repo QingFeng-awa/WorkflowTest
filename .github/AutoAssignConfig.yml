@@ -1,5 +1,5 @@
 # 设置为 true 以向拉取请求添加审查者
-addReviewers: false
+addReviewers: true
 
 # 设置为 true 以向拉取请求添加受理人
 addAssignees: true
@@ -13,14 +13,17 @@ reviewers:
 numberOfReviewers: 0
 # 要添加至拉取请求的受理人列表（使用 GitHub 用户名）
 # 如果设置了则将会覆盖审查者列表
-# assignees:
-#   - QingFeng-awa
+assignees:
+  - QingFeng-awa
 
 # 要添加至拉取请求的受理人数量
 # 设置为 0 以添加所有受理人
 # 如果未设置，则使用 numberOfReviewers 的值
-# numberOfAssignees: 2
+numberOfAssignees: 0
 
 # 要跳过添加审查者/受理人流程的拉取请求关键词列表
 # skipKeywords:
 #   - wip
+
+# 是否在草案上也运行此工作流
+# runOnDraft: true
