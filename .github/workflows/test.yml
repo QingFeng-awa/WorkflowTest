@@ -8,12 +8,22 @@ permissions:
   pull-requests: write
 
 jobs:
-  assign:
+  assign_self_to_pull_request:
+    if: ${{ github.actor != 'dependabot[bot]' }}
     name: Assign self to pull request
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Assign self to pull request
-        uses: actions-ecosystem/action-add-assignees@v1
+        uses: actions/github-script@v8
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          assignees: ${{ github.actor }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const assignee = context.payload.pull_request.user.login;
+            const issue_number = context.payload.pull_request.number;
+            
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              assignees: [assignee]
+            });
