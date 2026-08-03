@@ -7,7 +7,7 @@ body:
     attributes:
       label: 问题描述
       description: 发生了什么？
-      placeholder: 一个清晰且具体的描述发生了什么，或遇到了什么问题。
+      placeholder: 清晰且具体的描述发生了什么，或遇到了什么问题。
     validations:
       required: true
 
@@ -15,7 +15,11 @@ body:
     attributes:
       label: 如何复现？
       description: 复现该问题的步骤。
-      placeholder: 1. Open '...' e.g.
+      placeholder: |
+        例如：<br>
+        1. 打开 ...<br>
+        2. 点击 ...<br>
+        3. 问题复现
     validations:
       required: true
 
@@ -34,7 +38,7 @@ body:
         - "Windows"
         - "MacOS"
         - "Linux"
-        - "其它操作系统"
+        - "Other"
     validations:
       required: true
 
@@ -69,7 +73,7 @@ body:
       label: 辅助信息
       description: |
         与问题相关的其他辅助信息，例如复现视频、完整日志文件。图片请在问题描述中上传。<br>
-        如果您要提供的日志过长以至不适合直接填写到上一栏，您可以将完整的日志文件上传到这里。
+        如果您要提供的日志过长以至不适合直接填写到上一栏，您可以选择只在上一栏贴关键日志，将完整的日志文件上传到这里。
     validations:
       accept: ".txt,.log,.mp4,.mov,.webm"
 
@@ -79,9 +83,11 @@ body:
       options:
         - label: 我已在 [Issue 列表](https://github.com/AstrBotDevs/AstrBot/issues)中搜索过相关问题仍无法解决，或该问题从未被报告过。
           required: true
-        - label: 我已尝试过停用所有插件，排除了可能因插件导致的问题。
+        - label: 我已尝试过禁用所有插件，排除了可能是因插件导致的问题。
           required: true
         - label: 我报告的问题与 AstrBot 本体相关，而非在报告某一插件的问题。
+          required: true
+        - label: 我已阅读并同意本项目的[贡献者行为准则](https://github.com/AstrBotDevs/AstrBot/blob/master/CODE_OF_CONDUCT.md)。
           required: true
         - label: (可选)我愿意提交 PR 以帮助修复该问题。
           required: false
