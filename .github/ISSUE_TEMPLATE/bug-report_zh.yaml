@@ -78,17 +78,13 @@ body:
       label: 检查清单
       options:
         - label: 我已在 [Issue 列表](https://github.com/AstrBotDevs/AstrBot/issues)中搜索过相关问题仍无法解决，或该问题从未被报告过。
+          required: true
         - label: 我已尝试过停用所有插件，排除插件导致的问题。
+          required: true
         - label: 我报告的问题与 AstrBot 本体相关，而非在报告某一插件的问题。
-    validations:
-      required: true
-
-  - type: checkboxes
-    attributes:
-      label: 你愿意提交 PR 吗？
-      description: 这不是必需的，但我们很乐意在你的贡献过程中提供指导，特别是如果你已经很好地理解了如何实现修复。
-      options:
-        - label: 我愿意提交 PR 以帮助修复该问题。
+          required: true
+        - label: （可选）我愿意提交 PR 以帮助修复该问题。
+          required: false
 
   - type: markdown
     attributes:
