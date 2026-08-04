@@ -16,9 +16,9 @@ body:
       label: Reproduction Steps
       description: Steps to reproduce the issue.
       placeholder: |
-        For example:<br>
-        1. Open ...<br>
-        2. Click ...<br>
+        For example:
+        1. Open ...
+        2. Click ...
         3. Issue reproduced
     validations:
       required: true
@@ -76,7 +76,7 @@ body:
         Other supplementary information related to the issue, such as reproduction videos or complete log files. Please upload images in the description.<br>
         If the logs you want to provide are too long to fit in the previous field, you can paste only the key logs there and upload the complete log file here.
     validations:
-      accept: ".txt,.log,.mp4,.mov,.webm"
+      accept: ".txt,.log,.mp4,.mov,.webm,.zip,.gz"
 
   - type: checkboxes
     attributes:
